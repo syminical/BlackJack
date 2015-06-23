@@ -7,13 +7,19 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class BlackJack extends JFrame {
+	
 
 	
+	private Deck deck = new Deck();
+
+	private String playerCards = "", dealerCards = "", playerCards2 = "<html>" + playerCards + "</html>", dealerCards2 = "<html>" + dealerCards + "</html>";
+
+	private int pScore = 0, dScore = 0, pAces = 0, dAces = 0;
+
+	private Card temp;
 
 	private static JFrame box;
 	
-	private String playerCards = "<font color = red>[1]</font> <font color = orange>[2]</font> <font color = yellow>[3]</font> <font color = #00BFFF>[4]</font>", dealerCards = "";
-
 	private JPanel atlas = new JPanel();
 	private JPanel scoreContainer = new JPanel();
 	private JPanel playerHandContainer = new JPanel();
@@ -26,23 +32,21 @@ public class BlackJack extends JFrame {
 	private JPanel rButtonContainer = new JPanel();
 	
 	private JLabel playerScore = new JLabel("player: ");
-	private JLabel playerScore2 = new JLabel("0");
+	private JLabel playerScore2 = new JLabel("" + pScore);
 	private JLabel dealerScore = new JLabel("dealer: ");
-	private JLabel dealerScore2 = new JLabel("0");
+	private JLabel dealerScore2 = new JLabel("" + dScore);
 	private JLabel scoreSpacer = new JLabel("                   ");
-	private JLabel playerHand = new JLabel("P: ");
-	private JLabel playerHand2 = new JLabel("<html>" + playerCards + "</html>");
-	private JLabel dealerHand = new JLabel("D: ");
-	private JLabel dealerHand2 = new JLabel("<html>" + dealerCards + "</html>");
+	private JLabel playerHand = new JLabel("P:");
+	private JLabel playerHand2 = new JLabel(playerCards2);
+	private JLabel dealerHand = new JLabel("D:");
+	private JLabel dealerHand2 = new JLabel(dealerCards2);
 	private JLabel comment1 = new JLabel("neither  ");
 	private JLabel comment2 = new JLabel("  wins!");
 	private JLabel againButton = new JLabel("again?");
 	private JLabel hitButton = new JLabel("hit!");
 	private JLabel buttonSpacer = new JLabel("             ");
 	private JLabel stayButton = new JLabel("stay");
-	private Border fencing = BorderFactory.createLineBorder(Color.GREEN, 1);
-
-	
+	private Border fencing = BorderFactory.createLineBorder(Color.GREEN, 1);	
 
 	public BlackJack() {
 
@@ -57,8 +61,6 @@ public class BlackJack extends JFrame {
 		buildAtlas();
 
 		buildABox();
-
-		//update();
 
 	}
 
@@ -211,45 +213,266 @@ public class BlackJack extends JFrame {
 
 	}
 
-	private void update() {
+	private String faceWrapper(int container) {
 
-		double start = 0, end = 0;
+		if (container == 1)
 
-		start = System.currentTimeMillis();
-
-		againButton.setText("height: " + atlas.getHeight() + " : width: " + atlas.getWidth());
-
-		end = System.currentTimeMillis();
-
-		try {
+			return "A";
 		
-			Thread.sleep(5000 - (int)(end - start));
+		else if (container == 11)
 
-		} catch (Exception e) {
+			return "J";
 
-			System.out.println("SOMEtING WNT WONG");
+		else if (container == 12)
 
-		}
+			return "Q";
 
-		update();
+		else if (container == 13)
+
+			return "K";
+
+		else
+
+			return "" + container;
 
 	}
 
+	private String wrapCard(Card container) {
+
+		if (container.getSuit() == 0) {
+
+			return " <font color = red>[ " + faceWrapper(container.getValue()) + " ]</font>";
+
+		} else if (container.getSuit() == 1) {
+
+			return " <font color = orange>[ " + faceWrapper(container.getValue()) + " ]</font>";
+
+		} else if (container.getSuit() == 2) {
+		
+			return " <font color = yellow>[ " + faceWrapper(container.getValue()) + " ]</font>";
+
+		} else if (container.getSuit() == 3) {
+
+			return " <font color = #00BFFF>[ " + faceWrapper(container.getValue()) + " ]</font>";
+
+		} else {
+
+			return " <font color = white>[ " + faceWrapper(container.getValue()) + " ]</font>";
+
+		}
+
+	}
+
+	private int valueWrapper(int container) {
+
+		if (container == 1)
+
+			return 11;
+
+		else if (container > 10)
+
+			return 10;
+
+		else 
+
+			return container;
+
+	}
+
+	private boolean checkScores() {
+
+		if (pScore > 21) {
+
+			if (dScore <= 21)
+
+				comment1.setText("dealer  ");
+
+			return true;
+
+		} else if (dScore > 21) {
+
+			 if (pScore <= 21)
+
+				comment1.setText("player  ");
+
+			return true;
+
+		} else if (pScore == 21) {
+
+			comment1.setText("player  ");
+
+			return true;
+
+		} else if (dScore == 21) {
+
+			comment1.setText("dealer  ");
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	private void checkScores2() {
+
+		if (!checkScores())
+
+			if (pScore > dScore)
+
+				comment1.setText("player  ");
+
+			else if (dScore > pScore)
+
+				comment1.setText("dealer  ");
+			
+	}
+
 	private void again() {
-	
-		playerScore2.setText("again");
+
+		menuContainer.setVisible(false);
+
+		pScore = 0;
+		pAces = 0;
+		dScore = 0;
+		dAces = 0;
+
+		comment1.setText("neither  ");
+
+		playerCards = "";
+		dealerCards = "";
+
+		playerHand2.setText("");
+		dealerHand2.setText("");
+
+		playerScore2.setText("" + 0);
+		dealerScore2.setText("" + 0);
+
+		deck = new Deck();
 	
 	}
 
 	private void hit() {
 
-		playerScore2.setText("hit");
+		if (pScore < 21 && dScore < 21 && !menuContainer.isVisible()) {
+	
+			temp = deck.drawCard();
 
+			pScore += valueWrapper(temp.getValue());
+
+			if (temp.getValue() == 1)
+
+				pAces++;
+
+			if (pScore > 21)
+
+				if (pAces > 0) {
+
+					while (pScore > 21 && pAces > 0) {
+
+						pScore -= 10;
+
+						pAces--;
+
+					}
+
+				}
+
+			playerCards += wrapCard(temp);
+
+			playerCards2 = "<html>" + playerCards + "</html>";
+
+			playerHand2.setText(playerCards2);
+
+			playerScore2.setText("" + pScore);
+
+			if (dScore < 17) {
+	
+				temp = deck.drawCard();
+
+				dScore += valueWrapper(temp.getValue());
+
+				if (temp.getValue() == 1)
+
+					dAces++;
+
+
+				if (dScore > 21)
+
+					if (dAces > 0) {
+
+						while (dScore > 21 && dAces > 0) {
+
+							dScore -= 10;
+
+							dAces--;
+
+						}
+
+					}
+
+				dealerCards += wrapCard(temp);
+	
+				dealerCards2 = "<html>" + dealerCards + "</html>";
+
+				dealerHand2.setText(dealerCards2);
+
+				dealerScore2.setText("" + dScore);
+
+			}
+
+			if (checkScores())
+	
+				menuContainer.setVisible(true);
+
+		}
 	}
 
 	private void stay() {
 
-		againButton.setText("stay");
+		if (!menuContainer.isVisible()) {
+
+			while (dScore < 17) {
+
+				temp = deck.drawCard();
+
+				dScore += valueWrapper(temp.getValue());
+
+				if (temp.getValue() == 1)
+
+					dAces++;
+
+
+				if (dScore > 21)
+
+					if (dAces > 0) {
+
+						while (dScore > 21 && dAces > 0) {
+
+							dScore -= 10;
+
+							dAces--;
+
+						}
+
+					}
+
+				dealerCards += wrapCard(temp);
+		
+				dealerCards2 = "<html>" + dealerCards + "</html>";
+
+				dealerHand2.setText(dealerCards2);
+
+				dealerScore2.setText("" + dScore);
+
+			}
+
+			checkScores2();
+
+			menuContainer.setVisible(true);
+
+		}
 
 	}
 
