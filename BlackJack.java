@@ -62,6 +62,9 @@ public class BlackJack extends JFrame {
 
 		buildABox();
 
+		hit();
+		hit();
+
 	}
 
 	private void addListeners() {
@@ -208,6 +211,7 @@ public class BlackJack extends JFrame {
 		setContentPane(atlas);
 		getContentPane().setPreferredSize(new Dimension(294, 156));
 		pack();
+		setResizable(false);
 		setLocationRelativeTo(null);
 		setVisible(true);
 
@@ -350,6 +354,9 @@ public class BlackJack extends JFrame {
 		dealerScore2.setText("" + 0);
 
 		deck = new Deck();
+
+		hit();
+		hit();
 	
 	}
 
